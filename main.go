@@ -41,11 +41,23 @@ func createMovie(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte("Movie added successfully"))
 }
 
+func getMovie(w http.ResponseWriter, req *http.Request) {
+  params := mux.Vars(req)
+  id := params["id"]
+
+  requestedMovie := moviesMap[id]
+
+  responseBytes := new(bytes.Buffer)
+  json.NewEncoder(responseBytes).Encode(requestedMovie)
+  w.Write(responseBytes.Bytes())
+}
+
 func main() {
   router := mux.NewRouter()
   
   router.HandleFunc("/movies", createMovie).Methods("POST")
   router.HandleFunc("/movies", getMovies).Methods("GET")
+  router.HandleFunc("/movies/{id}", getMovie).Methods("GET")
   
   fmt.Println("The server is listening on port 8080")
   if err := http.ListenAndServe("localhost:8080", router); err != nil {
