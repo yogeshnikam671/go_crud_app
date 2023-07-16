@@ -12,10 +12,15 @@ import (
 )
 
 // movies in-memory database
-var movies = []Movie {}
+var moviesMap = make(map[string]Movie) // mapOf<String, Movie>
 
 func getMovies(w http.ResponseWriter, req *http.Request) {
+  var movies = []Movie {}
   responseBytes := new(bytes.Buffer)
+  
+  for movieId := range moviesMap {
+    movies = append(movies, moviesMap[movieId])
+  }
   json.NewEncoder(responseBytes).Encode(movies)
   w.Write(responseBytes.Bytes())
 }
@@ -31,9 +36,8 @@ func createMovie(w http.ResponseWriter, req *http.Request) {
     http.Error(w, "400 Bad Request", http.StatusBadRequest)
     return
   }
-
-  movies = append(movies, movie)
-
+  
+  moviesMap[movie.ID] = movie
   w.Write([]byte("Movie added successfully"))
 }
 
