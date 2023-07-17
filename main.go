@@ -52,12 +52,23 @@ func getMovie(w http.ResponseWriter, req *http.Request) {
   w.Write(responseBytes.Bytes())
 }
 
+func deleteMovie(w http.ResponseWriter, req *http.Request) { 
+  params := mux.Vars(req)
+  id := params["id"]
+
+  delete(moviesMap, id)
+  
+  response := fmt.Sprintf("Movie with id: %s deleted successfully", id)
+  w.Write([]byte(response))
+}
+
 func main() {
   router := mux.NewRouter()
   
   router.HandleFunc("/movies", createMovie).Methods("POST")
   router.HandleFunc("/movies", getMovies).Methods("GET")
   router.HandleFunc("/movies/{id}", getMovie).Methods("GET")
+  router.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
   
   fmt.Println("The server is listening on port 8080")
   if err := http.ListenAndServe("localhost:8080", router); err != nil {
